@@ -14,7 +14,6 @@ const checkGPS = (ipCountryName: string, ipCode: string) => {
         const gpsCity = geo.city || geo.locality
         setGpsInfo(`📡 GPS: ${gpsCity}, ${geo.countryName} - ${lat.toFixed(4)}, ${lon.toFixed(4)} (Acc: ${acc.toFixed(0)}m)`)
         
-        // FIXED LOGIC V6.3 - No confusion
         if (ipCode && gpsCountry && ipCode !== gpsCountry) {
           if (ipCode !== 'SA' && gpsCountry === 'SA') {
             setFakeStatus(`✅ GPS REAL - But VPN Mismatch (IP: ${ipCountryName})`)
@@ -36,25 +35,25 @@ const checkGPS = (ipCountryName: string, ipCode: string) => {
         }
         setFakeStatus(`✅ GPS REAL - Matches Saudi IP`)
         setFakeColor('#22c55e')
-        if (vpnColor !== '#ef4444') setIsBlocked(false)
+        setIsBlocked(false)
 
-        // SAMA V7 BACKEND DOUBLE CHECK - NO IMPACT, SAFE
+        // SAMA V7 BACKEND DOUBLE CHECK
         try {
           const r = await fetch('/api/sama-check', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ lat, lon, accuracy: acc })
           })
-          const d: any = await r.json()
+          const d = await r.json() as any
           if (d.blocked) {
             setFakeStatus(d.reason)
             setFakeColor('#ef4444')
             setIsBlocked(true)
           } else {
-            setFakeStatus((prev: string) => prev + ' + ' + d.reason)
+            setFakeStatus(prev => prev + ' + ' + d.reason)
           }
         } catch {
-          // Backend fail = V6.3 continues - Zero Impact
+          // Backend fail = V6.3 continues
         }
 
       } catch {
