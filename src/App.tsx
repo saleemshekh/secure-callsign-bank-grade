@@ -57,6 +57,25 @@ export default function App() {
     )
   }, [step])
 
+  // SCREEN 3 - DASHBOARD
+  if (step === 3) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#f8fafc', padding: 16 }}>
+        <div style={{ background: '#16a34a', color: 'white', padding: 20, borderRadius: 20, maxWidth: 400, margin: '0 auto' }}>
+          <p style={{ opacity: 0.8, fontSize: 12 }}>Saleem Bank - SAMA Secure</p>
+          <h1 style={{ fontSize: 28, fontWeight: 800, marginTop: 8 }}>50,000 SAR</h1>
+          <p style={{ fontSize: 11, marginTop: 8, background: 'rgba(255,255,255,0.2)', padding: '6px 10px', borderRadius: 999 }}>✅ SAMA VERIFIED • IP: SA • {details}</p>
+        </div>
+        <div style={{ background: 'white', padding: 20, borderRadius: 20, maxWidth: 400, margin: '16px auto', boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
+          <h3 style={{ fontWeight: 700 }}>Quick Transfer</h3>
+          <button style={{ width: '100%', marginTop: 12, padding: 14, borderRadius: 12, background: '#0f172a', color: 'white', fontWeight: 700, border: 'none' }}>Transfer Money →</button>
+          <button onClick={()=>setStep(1)} style={{ width: '100%', marginTop: 10, padding: 12, borderRadius: 12, background: '#f1f5f9', border: 'none', fontWeight: 600 }}>Logout & Re-verify</button>
+        </div>
+        <p style={{ textAlign: 'center', fontSize: 11, color: '#94a3b8', marginTop: 10 }}>V8 Complete Flow: Gate ✅ → Consent ✅ → Dashboard ✅</p>
+      </div>
+    )
+  }
+
   // SCREEN 2 - CONSENT
   if (step === 2) {
     return (
@@ -78,7 +97,7 @@ export default function App() {
             <span style={{ fontSize: 13 }}>Mai tasdeeq karta hu ki mai Saudi me hu aur transaction continue karna chahta hu.<br/><span style={{ fontSize: 11, color: '#6b7280' }}>I confirm I am in Saudi Arabia.</span></span>
           </label>
 
-          <button disabled={!checked} onClick={()=>alert('MashaAllah! Consent Saved - Ab Dashboard banayenge')} style={{ width: '100%', marginTop: 20, padding: 16, borderRadius: 12, fontWeight: 800, color: 'white', background: checked? '#16a34a' : '#d1d5db', border: 'none', cursor: checked? 'pointer':'not-allowed' }}>
+          <button disabled={!checked} onClick={()=>setStep(3)} style={{ width: '100%', marginTop: 20, padding: 16, borderRadius: 12, fontWeight: 800, color: 'white', background: checked? '#16a34a' : '#d1d5db', border: 'none', cursor: checked? 'pointer':'not-allowed' }}>
             {checked? 'Continue Securely →' : 'Please Accept Consent'}
           </button>
           <p style={{ fontSize: 10, textAlign: 'center', color: '#9ca3af', marginTop: 12 }}>V7 Double Lock • Audit Log: CONSENT_GIVEN</p>
