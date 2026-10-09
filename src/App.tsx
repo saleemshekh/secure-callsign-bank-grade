@@ -67,3 +67,4 @@ const checkGPS = (ipCountryName: string, ipCode: string) => {
       setFakeColor('#f59e0b')
     }, { enableHighAccuracy: true, timeout: 10000 })
   }
+export default App;
