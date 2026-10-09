@@ -10,8 +10,8 @@ export default function App() {
   const [fakeStatus, setFakeStatus] = useState('Checking GPS...')
   const [fakeColor, setFakeColor] = useState('#fbbf24')
   const [isBlocked, setIsBlocked] = useState(false)
+  const [familyNote, setFamilyNote] = useState('Testing app')
 
-  // New V6 States
   const [bills, setBills] = useState([
     { id: 1, name: 'STC / موبايلي', amount: '150 SAR', date: '2026-10-15', paid: false },
     { id: 2, name: 'Electricity / الكهرباء', amount: '320 SAR', date: '2026-10-20', paid: false },
@@ -20,7 +20,7 @@ export default function App() {
 
   useEffect(() => { checkAll() }, [])
 
-  // === SAME OLD V5 CODE - NO CHANGE ===
+  // === SAMA SECURITY CORE - NO TOUCH V5 ===
   const checkAll = async () => {
     setVpn('Checking Real IP...')
     try {
@@ -86,9 +86,9 @@ export default function App() {
       setFakeColor('#f59e0b')
     }, { enableHighAccuracy: true, timeout: 10000 })
   }
-  // === V5 CODE END ===
 
   const toggleBill = (id: number) => {
+    if (isBlocked) return
     setBills(bills.map(b => b.id === id ? { ...b, paid: !b.paid } : b))
   }
 
@@ -96,8 +96,8 @@ export default function App() {
     return (
       <div style={{ minHeight: '100vh', background: '#0f172a', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
         <div style={{ background: '#1e293b', padding: 24, borderRadius: 20, width: 380, textAlign: 'center', border: `2px solid ${isBlocked ? '#ef4444' : fakeColor}` }}>
-          <h2 style={{ color: '#22c55e', margin: 0 }}>SAMA VAULT V6</h2>
-          <p style={{ fontSize: 10, color: '#94a3b8' }}>مؤسسة النقد العربي السعودي - Bank Grade</p>
+          <h2 style={{ color: '#22c55e', margin: 0 }}>SAMA VAULT V6.1</h2>
+          <p style={{ fontSize: 10, color: '#94a3b8' }}>مؤسسة النقد العربي السعودي - SAMA SECURE</p>
           <div style={{ background: '#0f172a', padding: 12, borderRadius: 12, marginTop: 12, textAlign: 'left' }}>
             <p style={{ fontSize: 12, color: vpnColor, fontWeight: 'bold', margin: 0 }}>{vpn}</p>
             <p style={{ fontSize: 10, opacity: 0.7, margin: '4px 0' }}>{ipInfo}</p>
@@ -105,7 +105,7 @@ export default function App() {
             <p style={{ fontSize: 10, opacity: 0.7, margin: '4px 0' }}>{gpsInfo}</p>
             <p style={{ fontSize: 12, color: fakeColor, fontWeight: 'bold', margin: '6px 0 0 0' }}>{fakeStatus}</p>
           </div>
-          {isBlocked && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 10, background: 'rgba(239,68,68,0.15)', padding: 8, borderRadius: 8 }}>🚫 BLOCKED: VPN/Fake GPS Not Allowed</p>}
+          {isBlocked && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 10, background: 'rgba(239,68,68,0.15)', padding: 8, borderRadius: 8 }}>🚫 BLOCKED: VPN/Fake GPS = No Payments Allowed</p>}
           <input type="password" value={pin} onChange={e => setPin(e.target.value)} placeholder="PIN: 1234" style={{ width: '90%', padding: 12, borderRadius: 10, marginTop: 12, textAlign: 'center', border: 'none' }} />
           <button onClick={() => pin === '1234' && !isBlocked && setAuth(true)} style={{ width: '100%', padding: 12, borderRadius: 10, background: isBlocked ? '#555' : '#22c55e', marginTop: 10, fontWeight: 'bold', border: 'none', color: isBlocked ? '#aaa' : 'black' }}>{isBlocked ? 'BLOCKED' : 'UNLOCK VAULT'}</button>
           <button onClick={checkAll} style={{ marginTop: 10, fontSize: 11, background: 'transparent', color: '#94a3b8', border: 'none', textDecoration: 'underline' }}>Re-Check All</button>
@@ -117,13 +117,12 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh', background: '#0f172a', color: 'white', padding: 20 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ color: '#22c55e', margin: 0 }}>VAULT V6 ✅</h1>
+        <h1 style={{ margin: 0, fontSize: 22 }}>VAULT V6.1 ✅</h1>
         <span style={{ fontSize: 10, background: '#1e293b', padding: '4px 8px', borderRadius: 20, color: '#94a3b8' }}>SAMA COMPLIANT</span>
       </div>
 
-      {/* SECURITY CARD - SAME AS V5 */}
       <div style={{ background: '#1e293b', padding: 15, borderRadius: 12, marginTop: 15, borderLeft: `4px solid ${fakeColor}` }}>
-        <p style={{ color: vpnColor, fontWeight: 'bold', margin: 0 }}>🔒 {vpn}</p>
+        <p style={{ color: vpnColor, fontWeight: 'bold', margin: 0, fontSize: 14 }}>🔒 {vpn}</p>
         <p style={{ fontSize: 12, margin: '6px 0' }}>{ipInfo}</p>
         <p style={{ fontSize: 12, margin: '6px 0' }}>{gpsInfo}</p>
         <p style={{ color: fakeColor, fontWeight: 'bold', fontSize: 13, margin: '6px 0' }}>{fakeStatus}</p>
@@ -131,10 +130,10 @@ export default function App() {
           <button onClick={checkAll} style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#334155', color: 'white', fontSize: 12 }}>Re-Check</button>
           <button onClick={() => setAuth(false)} style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#ef4444', color: 'white', fontSize: 12 }}>Lock</button>
         </div>
+        {isBlocked && <p style={{ fontSize: 11, color: '#ef4444', marginTop: 8, background: 'rgba(239,68,68,0.15)', padding: 6, borderRadius: 6 }}>🔒 All Payments Disabled - Real Location Required</p>}
       </div>
 
-      {/* NEW V6 FEATURES */}
-      <h3 style={{ marginTop: 20, color: '#e2e8f0' }}>💳 Bills & Payments / الفواتير</h3>
+      <h3 style={{ marginTop: 20, color: '#e2e8f0', fontSize: 18 }}>💳 Bills & Payments / الفواتير</h3>
       <div style={{ display: 'grid', gap: 10 }}>
         {bills.map(b => (
           <div key={b.id} style={{ background: '#1e293b', padding: 12, borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: b.paid ? 0.6 : 1, border: b.paid ? '1px solid #22c55e' : '1px solid transparent' }}>
@@ -142,18 +141,41 @@ export default function App() {
               <p style={{ margin: 0, fontWeight: 'bold', fontSize: 14 }}>{b.name}</p>
               <p style={{ margin: 0, fontSize: 11, color: '#94a3b8' }}>Due: {b.date} • {b.amount}</p>
             </div>
-            <button onClick={() => toggleBill(b.id)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', background: b.paid ? '#22c55e' : '#334155', color: b.paid ? 'black' : 'white', fontSize: 12, fontWeight: 'bold' }}>{b.paid ? '✓ Paid' : 'Pay'}</button>
+            <button 
+              disabled={isBlocked}
+              onClick={() => toggleBill(b.id)} 
+              style={{ 
+                padding: '6px 14px', 
+                borderRadius: 20, 
+                border: 'none', 
+                background: isBlocked ? '#444' : b.paid ? '#22c55e' : '#334155', 
+                color: isBlocked ? '#888' : b.paid ? 'black' : 'white', 
+                fontSize: 12, 
+                fontWeight: 'bold',
+                cursor: isBlocked ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {isBlocked ? '🔒 Blocked' : b.paid ? '✓ Paid' : 'Pay'}
+            </button>
           </div>
         ))}
       </div>
 
-      <h3 style={{ marginTop: 20, color: '#e2e8f0' }}>👨‍👩‍👧 Family Vault</h3>
+      <h3 style={{ marginTop: 20, color: '#e2e8f0', fontSize: 18 }}>👨‍👩‍👧 Family Vault</h3>
       <div style={{ background: '#1e293b', padding: 15, borderRadius: 12 }}>
         <p style={{ fontSize: 13, margin: 0 }}>Secure Notes for Family - Encrypted & Saudi Only</p>
-        <textarea placeholder="Add private note... / إضافة ملاحظة" style={{ width: '95%', marginTop: 10, padding: 10, borderRadius: 8, background: '#0f172a', color: 'white', border: '1px solid #334155' }} rows={3}></textarea>
+        <textarea 
+          disabled={isBlocked}
+          value={familyNote}
+          onChange={(e) => !isBlocked && setFamilyNote(e.target.value)}
+          placeholder={isBlocked ? "🚫 Blocked - Real Location Required / الموقع الحقيقي مطلوب" : "Add private note... / إضافة ملاحظة"} 
+          style={{ width: '95%', marginTop: 10, padding: 10, borderRadius: 8, background: isBlocked ? '#111' : '#0f172a', color: 'white', border: '1px solid #334155', opacity: isBlocked ? 0.5 : 1 }} 
+          rows={3}
+        />
+        {isBlocked && <p style={{ fontSize: 10, color: '#ef4444', marginTop: 6 }}>Editing disabled due to fake location</p>}
       </div>
 
-      <p style={{ fontSize: 10, textAlign: 'center', color: '#475569', marginTop: 20 }}>SAMA Compliant • Anti VPN & Fake GPS • Riyadh Secure Server</p>
+      <p style={{ fontSize: 10, textAlign: 'center', color: '#475569', marginTop: 20 }}>SAMA Compliant • Anti VPN & Fake GPS • Riyadh Secure • V6.1</p>
     </div>
   )
 }
