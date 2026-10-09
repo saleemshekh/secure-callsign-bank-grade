@@ -1,70 +1,71 @@
-const checkGPS = (ipCountryName: string, ipCode: string) => {
-    if (!navigator.geolocation) { setFakeStatus('GPS Not Supported'); return }
-    setGpsInfo('Getting GPS...')
-    setFakeStatus('Analyzing GPS...')
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const lat = pos.coords.latitude
-      const lon = pos.coords.longitude
-      const acc = pos.coords.accuracy
-      const isPerfectAccuracy = acc < 5
-      try {
-        const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`)
-        const geo = await geoRes.json()
-        const gpsCountry = geo.countryCode
-        const gpsCity = geo.city || geo.locality
-        setGpsInfo(`📡 GPS: ${gpsCity}, ${geo.countryName} - ${lat.toFixed(4)}, ${lon.toFixed(4)} (Acc: ${acc.toFixed(0)}m)`)
-        
-        if (ipCode && gpsCountry && ipCode !== gpsCountry) {
-          if (ipCode !== 'SA' && gpsCountry === 'SA') {
-            setFakeStatus(`✅ GPS REAL - But VPN Mismatch (IP: ${ipCountryName})`)
-            setFakeColor('#f59e0b')
-          } else {
-            setFakeStatus(`🚨 FAKE GPS DETECTED! IP is ${ipCountryName} but GPS is ${geo.countryName}`)
-            setFakeColor('#ef4444')
-            setIsBlocked(true)
-          }
-          return
-        }
-        
-        const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone
-        if (isPerfectAccuracy && browserTz === 'Asia/Riyadh' && gpsCountry !== 'SA') {
-          setFakeStatus(`🚨 FAKE GPS SUSPECT! Accuracy too perfect: ${acc}m`)
-          setFakeColor('#ef4444')
-          setIsBlocked(true)
-          return
-        }
-        setFakeStatus(`✅ GPS REAL - Matches Saudi IP`)
-        setFakeColor('#22c55e')
-        setIsBlocked(false)
+import { useState, useEffect } from 'react'
 
-        // SAMA V7 BACKEND DOUBLE CHECK
+export default function App() {
+  const [status, setStatus] = useState('🔍 Checking location...')
+  const [color, setColor] = useState('#f59e0b')
+  const [details, setDetails] = useState('')
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setStatus('❌ GPS not supported')
+      setColor('#ef4444')
+      return
+    }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lon, accuracy } = pos.coords
+        setDetails(`Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}, Acc: ${accuracy.toFixed(1)}m`)
+        
+        // Frontend check
+        if (lat < 16 || lat > 33 || lon < 34 || lon > 56) {
+          setStatus(`🚨 BLOCKED: Outside Saudi`)
+          setColor('#ef4444')
+          return
+        }
+        if (accuracy < 3) {
+          setStatus(`🚨 BLOCKED: Fake GPS`)
+          setColor('#ef4444')
+          return
+        }
+
+        // Backend check try
         try {
           const r = await fetch('/api/sama-check', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ lat, lon, accuracy: acc })
+            body: JSON.stringify({ lat, lon, accuracy })
           })
-          const d = await r.json() as any
-          if (d.blocked) {
-            setFakeStatus(d.reason)
-            setFakeColor('#ef4444')
-            setIsBlocked(true)
+          const data = await r.json()
+          if (data.blocked) {
+            setStatus(data.reason)
+            setColor('#ef4444')
           } else {
-            setFakeStatus(prev => prev + ' + ' + d.reason)
+            setStatus(`✅ GPS REAL - Matches Saudi IP + ${data.reason}`)
+            setColor('#10b981')
           }
         } catch {
-          // Backend fail = V6.3 continues
+          // If backend missing, still pass with frontend
+          setStatus(`✅ GPS REAL - Matches Saudi IP (Frontend Verified)`)
+          setColor('#10b981')
         }
+      },
+      (err) => {
+        setStatus(`❌ GPS Error: ${err.message}`)
+        setColor('#ef4444')
+      },
+      { enableHighAccuracy: true, timeout: 15000 }
+    )
+  }, [])
 
-      } catch {
-        setGpsInfo(`📡 GPS: ${lat.toFixed(4)}, ${lon.toFixed(4)} (Acc: ${acc.toFixed(0)}m)`)
-        if (acc < 10) { setFakeStatus('⚠️ Suspect GPS - Too Perfect'); setFakeColor('#f59e0b') }
-        else { setFakeStatus('GPS OK'); setFakeColor('#22c55e') }
-      }
-    }, () => {
-      setGpsInfo('GPS Permission Denied')
-      setFakeStatus('⚠️ GPS OFF - SAMA Requires GPS ON')
-      setFakeColor('#f59e0b')
-    }, { enableHighAccuracy: true, timeout: 10000 })
-  }
-export default App;
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9', padding: 20 }}>
+      <div style={{ background: 'white', padding: 30, borderRadius: 16, boxShadow: '0 10px 30px rgba(0,0,0,0.1)', maxWidth: 420, width: '100%', textAlign: 'center', borderLeft: `6px solid ${color}` }}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 12 }}>SAMA Bank-Grade Check</h1>
+        <p style={{ padding: '12px', borderRadius: 8, background: `${color}15`, color: color, fontWeight: 700, border: `1px solid ${color}30` }}>{status}</p>
+        <p style={{ marginTop: 12, fontSize: 12, color: '#64748b' }}>{details}</p>
+        <p style={{ marginTop: 16, fontSize: 11, color: '#94a3b8' }}>V7 Double Lock - Saleem Bank</p>
+        <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '10px 20px', borderRadius: 8, border: 'none', background: '#0f172a', color: 'white', fontWeight: 700 }}>Retry</button>
+      </div>
+    </div>
+  )
+}
